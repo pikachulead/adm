@@ -9,3 +9,4 @@ cdk.out/
 .claude/settings.local.json
 
 *.log
+.logs/
