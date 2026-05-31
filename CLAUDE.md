@@ -1,3 +1,42 @@
+# ADM - Architecture Domain Model Explorer
+
+## Quick Start
+
+```bash
+docker compose up -d                        # PostgreSQL on :5432
+cd api && npm run dev                       # API on :3001
+cd frontend && npm run dev                  # Frontend on :5173
+```
+
+## Project Structure
+
+```
+adm/
+├── api/                    # Lambda handlers + services (Node.js 22, TypeScript)
+│   ├── src/handlers/       # Lambda Function URL handlers (search, expand, update, health)
+│   ├── src/repositories/   # IArchitectureRepository interface + PostgreSQL implementation
+│   ├── src/llm/            # ILlmProvider interface + Anthropic/OpenAI-compatible implementations
+│   ├── src/agent/          # Agent service, tools, tool executor, system prompt builder
+│   └── src/services/       # Graph transformer
+├── frontend/               # React SPA (Vite, Tailwind, React Flow)
+├── db/init/                # SQL init scripts (auto-run by Docker on first start)
+├── docker-compose.yml      # PostgreSQL 16-alpine
+└── .env.example            # Environment variable template
+```
+
+## Testing
+
+```bash
+npm test --workspace=@adm/api         # API tests (integration + unit)
+npm test --workspace=@adm/frontend    # Frontend tests
+```
+
+## Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in actual values. Never commit `.env.local`.
+
+## Coding Conventions
+
 There is beauty in simplicity.
 Good architecture is modular, with descriptive names and strong internal cohesion.
 Resuse code, and avoid reinventing the wheel.

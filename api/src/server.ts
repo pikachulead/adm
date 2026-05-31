@@ -7,6 +7,11 @@ import { handler as searchHandler } from './handlers/search.js';
 import { handler as expandHandler } from './handlers/expand.js';
 import { handler as updateHandler } from './handlers/update.js';
 import { handler as healthHandler } from './handlers/health.js';
+import { withTimeout } from './middleware/timeout.js';
+
+const searchWithTimeout = withTimeout(searchHandler, 60_000);
+const expandWithTimeout = withTimeout(expandHandler, 5_000);
+const updateWithTimeout = withTimeout(updateHandler, 60_000);
 
 const app = new Hono();
 
@@ -37,9 +42,9 @@ function lambdaAdapter(handler: (event: LambdaEvent) => Promise<LambdaResponse>)
   };
 }
 
-app.post('/api/search', lambdaAdapter(searchHandler));
-app.post('/api/expand', lambdaAdapter(expandHandler));
-app.post('/api/update', lambdaAdapter(updateHandler));
+app.post('/api/search', lambdaAdapter(searchWithTimeout));
+app.post('/api/expand', lambdaAdapter(expandWithTimeout));
+app.post('/api/update', lambdaAdapter(updateWithTimeout));
 app.get('/api/health', lambdaAdapter(healthHandler));
 
 const port = parseInt(process.env.API_PORT ?? '3001', 10);

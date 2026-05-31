@@ -116,11 +116,13 @@ export class OpenAiCompatibleProvider implements ILlmProvider {
       return { content: null, toolCalls: [], stopReason: 'end_turn' };
     }
 
-    const toolCalls: LlmToolCall[] = (choice.message.tool_calls ?? []).map((tc) => ({
-      id: tc.id,
-      name: tc.function.name,
-      input: JSON.parse(tc.function.arguments) as Record<string, unknown>,
-    }));
+    const toolCalls: LlmToolCall[] = (choice.message.tool_calls ?? [])
+      .filter((tc): tc is OpenAI.ChatCompletionMessageToolCall & { type: 'function' } => tc.type === 'function')
+      .map((tc) => ({
+        id: tc.id,
+        name: tc.function.name,
+        input: JSON.parse(tc.function.arguments) as Record<string, unknown>,
+      }));
 
     return {
       content: choice.message.content,

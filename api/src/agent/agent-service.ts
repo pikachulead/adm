@@ -7,6 +7,7 @@ import { executeTool } from './tool-executor.js';
 import { buildSystemPrompt } from './system-prompt.js';
 
 const MAX_TOOL_CALLS = 10;
+const MAX_GRAPH_NODES = 200;
 
 export class AgentService {
   constructor(
@@ -32,10 +33,7 @@ export class AgentService {
       if (response.stopReason === 'end_turn' || response.toolCalls.length === 0) {
         return {
           answer: response.content ?? '',
-          graph: {
-            nodes: [...allNodes.values()],
-            edges: [...allEdges.values()],
-          },
+          graph: capGraph(allNodes, allEdges),
         };
       }
 
@@ -85,10 +83,7 @@ export class AgentService {
 
     return {
       answer: finalResponse.content ?? '',
-      graph: {
-        nodes: [...allNodes.values()],
-        edges: [...allEdges.values()],
-      },
+      graph: capGraph(allNodes, allEdges),
     };
   }
 }
@@ -108,6 +103,26 @@ function mergeGraph(
       edgeMap.set(edge.id, edge);
     }
   }
+}
+
+function capGraph(
+  nodeMap: Map<string, GraphNode>,
+  edgeMap: Map<string, GraphEdge>,
+): GraphData {
+  const nodes = [...nodeMap.values()];
+  const edges = [...edgeMap.values()];
+
+  if (nodes.length <= MAX_GRAPH_NODES) {
+    return { nodes, edges };
+  }
+
+  const cappedNodes = nodes.slice(0, MAX_GRAPH_NODES);
+  const cappedNodeIds = new Set(cappedNodes.map((n) => n.id));
+  const cappedEdges = edges.filter(
+    (e) => cappedNodeIds.has(e.source) && cappedNodeIds.has(e.target),
+  );
+
+  return { nodes: cappedNodes, edges: cappedEdges };
 }
 
 export function createAgentService(
