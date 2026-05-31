@@ -1,0 +1,37 @@
+export const en = {
+  app: {
+    title: 'ADM Explorer',
+    subtitle: 'Architecture Domain Model',
+  },
+  search: {
+    placeholder: 'Ask about your architecture...',
+    submit: 'Search',
+    loading: 'Thinking...',
+    empty: 'Ask a question to explore the architecture',
+  },
+  detail: {
+    title: 'Details',
+    nodeTitle: 'Node Details',
+    edgeTitle: 'Relationship Details',
+    empty: 'Select a node or relationship to view details',
+    type: 'Type',
+    name: 'Name',
+    source: 'Source',
+    target: 'Target',
+    relationship: 'Relationship',
+  },
+  graph: {
+    empty: 'No graph data to display',
+    fitView: 'Fit View',
+    nodes: 'nodes',
+    edges: 'edges',
+  },
+  entityTypes: {
+    domain: 'Domain',
+    capability: 'Capability',
+    process: 'Process',
+    system: 'System',
+    technology: 'Technology',
+    data_entity: 'Data Entity',
+  },
+} as const;
