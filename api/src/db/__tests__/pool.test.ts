@@ -1,5 +1,5 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { getPool, closePool } from '../pool.js';
+import { getPool, closePool } from '../../repositories/postgresql/pg-pool.js';
 
 describe('database connectivity', () => {
   afterAll(async () => {
