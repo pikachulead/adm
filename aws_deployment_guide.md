@@ -39,9 +39,8 @@
 | Aurora Serverless v2 | PostgreSQL database | ~$0.12/ACU-hour when active, scales to 0.5 ACU min |
 | S3 | Frontend static site hosting | < $1 |
 | Secrets Manager | DB credentials + LLM API key | $0.80 (2 secrets) |
-| VPC (no NAT Gateway) | Network for Aurora | $0 |
 
-**No API Gateway required** — Lambda Function URLs provide direct HTTPS endpoints.
+**No API Gateway, no custom VPC, no NAT Gateway.** Lambda runs in AWS public network (default). Aurora uses the default VPC with a public endpoint. Lambda Function URLs provide direct HTTPS endpoints.
 
 ## Prerequisites
 

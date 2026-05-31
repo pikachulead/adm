@@ -13,24 +13,13 @@ export class DatabaseStack extends cdk.Stack {
   public readonly dbEndpoint: string;
   public readonly dbPort: string;
   public readonly dbName: string;
-  public readonly securityGroup: ec2.ISecurityGroup;
 
   constructor(scope: Construct, id: string, props: DatabaseStackProps) {
     super(scope, id, props);
 
     const { envName } = props;
 
-    const vpc = new ec2.Vpc(this, 'AdmVpc', {
-      maxAzs: 2,
-      natGateways: 0,
-      subnetConfiguration: [
-        {
-          name: 'public',
-          subnetType: ec2.SubnetType.PUBLIC,
-          cidrMask: 24,
-        },
-      ],
-    });
+    const vpc = ec2.Vpc.fromLookup(this, 'DefaultVpc', { isDefault: true });
 
     const dbSecurityGroup = new ec2.SecurityGroup(this, 'DbSecurityGroup', {
       vpc,
@@ -43,8 +32,6 @@ export class DatabaseStack extends cdk.Stack {
       ec2.Port.tcp(5432),
       'Allow PostgreSQL access',
     );
-
-    this.securityGroup = dbSecurityGroup;
 
     const dbCredentials = new secretsmanager.Secret(this, 'DbCredentials', {
       secretName: `adm/${envName}/db-credentials`,
