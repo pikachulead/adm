@@ -1,4 +1,4 @@
-import type { SearchResponse, ExpandResponse, EntityType } from '@/types/index.js';
+import type { SearchResponse, ExpandResponse, GraphData, EntityType } from '@/types/index.js';
 
 const BASE_URL = '/api';
 
@@ -30,6 +30,10 @@ export function expandNode(nodeType: EntityType, nodeId: string): Promise<Expand
 
 export function updatePortfolio(requestText: string): Promise<SearchResponse> {
   return request<SearchResponse>('/update', { request: requestText });
+}
+
+export function fetchOrgGraph(): Promise<GraphData> {
+  return request<GraphData>('/org');
 }
 
 export function healthCheck(): Promise<{ status: string; database: string }> {

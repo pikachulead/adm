@@ -7,6 +7,7 @@ import { handler as searchHandler } from './handlers/search.js';
 import { handler as expandHandler } from './handlers/expand.js';
 import { handler as updateHandler } from './handlers/update.js';
 import { handler as healthHandler } from './handlers/health.js';
+import { handler as orgHandler } from './handlers/org.js';
 import { withTimeout } from './middleware/timeout.js';
 
 const searchWithTimeout = withTimeout(searchHandler, 60_000);
@@ -45,6 +46,7 @@ function lambdaAdapter(handler: (event: LambdaEvent) => Promise<LambdaResponse>)
 app.post('/api/search', lambdaAdapter(searchWithTimeout));
 app.post('/api/expand', lambdaAdapter(expandWithTimeout));
 app.post('/api/update', lambdaAdapter(updateWithTimeout));
+app.get('/api/org', lambdaAdapter(orgHandler));
 app.get('/api/health', lambdaAdapter(healthHandler));
 
 const port = parseInt(process.env.API_PORT ?? '3001', 10);

@@ -4,7 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
+const envPath = path.resolve(__dirname, '../../../../.env.local');
+dotenv.config({ path: envPath });
 
 let pool: pg.Pool | null = null;
 

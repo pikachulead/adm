@@ -21,6 +21,7 @@ export function App() {
     selection,
     setSelection,
     sendQuery,
+    loadOrg,
   } = useArchitectureSearch();
 
   const clearError = useCallback(() => {}, []);
@@ -35,7 +36,17 @@ export function App() {
           <h1 className="text-lg font-bold text-gray-900">{en.app.title}</h1>
           <span className="text-xs text-gray-400">{en.app.subtitle}</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={loadOrg}
+            disabled={loading}
+            className="px-3 py-1.5 text-xs font-semibold rounded-md border border-blue-600 text-blue-600
+                       hover:bg-blue-600 hover:text-white transition-colors duration-150
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {en.app.navigateOrg}
+          </button>
+          <div className="w-px h-5 bg-gray-200" />
           {LEGEND_TYPES.map((type) => {
             const config = NODE_CONFIG[type];
             return (

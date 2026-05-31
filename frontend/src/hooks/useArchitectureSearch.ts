@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { GraphData, ChatMessage, Selection } from '@/types/index.js';
-import { searchArchitecture } from '@/api/client.js';
+import { searchArchitecture, fetchOrgGraph } from '@/api/client.js';
 
 interface UseArchitectureSearchReturn {
   messages: ChatMessage[];
@@ -10,6 +10,7 @@ interface UseArchitectureSearchReturn {
   selection: Selection;
   setSelection: (selection: Selection) => void;
   sendQuery: (query: string) => Promise<void>;
+  loadOrg: () => Promise<void>;
   clearGraph: () => void;
 }
 
@@ -66,6 +67,22 @@ export function useArchitectureSearch(): UseArchitectureSearchReturn {
     }
   }, []);
 
+  const loadOrg = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setSelection(null);
+
+    try {
+      const orgGraph = await fetchOrgGraph();
+      setGraph(orgGraph);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to load organization graph';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const clearGraph = useCallback(() => {
     setGraph(EMPTY_GRAPH);
     setSelection(null);
@@ -79,6 +96,7 @@ export function useArchitectureSearch(): UseArchitectureSearchReturn {
     selection,
     setSelection,
     sendQuery,
+    loadOrg,
     clearGraph,
   };
 }

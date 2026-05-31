@@ -2,6 +2,7 @@ export const en = {
   app: {
     title: 'ADM Explorer',
     subtitle: 'Architecture Domain Model',
+    navigateOrg: 'Navigate Org',
   },
   search: {
     placeholder: 'Ask about your architecture...',
