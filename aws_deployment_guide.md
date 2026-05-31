@@ -57,7 +57,7 @@ The deploying user/role needs permissions for:
 - `lambda:*`
 - `rds:*`
 - `s3:*`
-- `ec2:*` (VPC, subnets, security groups)
+- `ec2:*` (security groups, default VPC lookup)
 - `secretsmanager:*`
 - `iam:CreateRole`, `iam:AttachRolePolicy`, `iam:PassRole`
 - `sts:AssumeRole`
@@ -101,8 +101,7 @@ npx cdk deploy Adm-dev-Database
 ```
 
 This creates:
-- VPC with 2 public subnets
-- Security group allowing PostgreSQL (port 5432) access
+- Security group in default VPC allowing PostgreSQL (port 5432) access
 - Aurora Serverless v2 PostgreSQL 16 cluster
 - Secrets Manager secret with generated DB credentials
 
@@ -290,7 +289,7 @@ This removes all stacks including the Aurora database. **Data will be lost.**
 
 This deployment uses **public RDS access** for simplicity. For production:
 
-1. **Move RDS to private subnets** — add a NAT Gateway ($32/month) so Lambda can reach both RDS and external LLM APIs
+1. **Move RDS to private subnets** — create a custom VPC with private subnets and a NAT Gateway ($32/month) so Lambda can reach both RDS and external LLM APIs
 2. **Add API authentication** — set `ADM_API_USER` and `ADM_API_PASSWORD` environment variables on the Lambda functions
 3. **Restrict Lambda Function URL auth** — change `authType` from `NONE` to `AWS_IAM` and use CloudFront with OAC
 4. **Add CloudFront** — in front of both S3 (HTTPS) and Lambda (caching, WAF)
