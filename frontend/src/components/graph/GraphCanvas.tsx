@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ReactFlow,
   useNodesState,
@@ -13,7 +13,7 @@ import '@xyflow/react/dist/style.css';
 import { AdmNode } from './AdmNode.js';
 import { AdmEdge } from './AdmEdge.js';
 import { applyDagreLayout } from './layout.js';
-import { NODE_CONFIG, getEdgeColor } from '@/constants/node-config.js';
+import { NODE_CONFIG } from '@/constants/node-config.js';
 import type { GraphData, Selection, GraphNode, GraphEdge, EntityType } from '@/types/index.js';
 import { en } from '@/i18n/index.js';
 
@@ -47,8 +47,11 @@ interface GraphCanvasInnerProps {
 function GraphCanvasInner({ graph, onSelect }: GraphCanvasInnerProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const { fitView } = useReactFlow();
+  const { fitView, setCenter, getZoom } = useReactFlow();
   const prevGraphRef = useRef<GraphData | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [matchIndex, setMatchIndex] = useState(0);
+  const [matches, setMatches] = useState<Node[]>([]);
 
   useEffect(() => {
     if (graph === prevGraphRef.current) return;
@@ -57,6 +60,8 @@ function GraphCanvasInner({ graph, onSelect }: GraphCanvasInnerProps) {
     if (graph.nodes.length === 0) {
       setNodes([]);
       setEdges([]);
+      setSearchTerm('');
+      setMatches([]);
       return;
     }
 
@@ -66,9 +71,74 @@ function GraphCanvasInner({ graph, onSelect }: GraphCanvasInnerProps) {
 
     setNodes(positioned);
     setEdges(flowEdges);
+    setSearchTerm('');
+    setMatches([]);
 
     setTimeout(() => fitView({ padding: 0.15, duration: 300 }), 50);
   }, [graph, setNodes, setEdges, fitView]);
+
+  const handleSearch = useCallback(
+    (term: string) => {
+      setSearchTerm(term);
+      const lower = term.toLowerCase().trim();
+
+      if (!lower) {
+        setMatches([]);
+        setMatchIndex(0);
+        setNodes((prev) =>
+          prev.map((n) => ({ ...n, className: '' })),
+        );
+        return;
+      }
+
+      const found = nodes.filter((n) =>
+        (n.data.label as string).toLowerCase().includes(lower),
+      );
+      setMatches(found);
+      setMatchIndex(0);
+
+      setNodes((prev) =>
+        prev.map((n) => {
+          const isMatch = (n.data.label as string).toLowerCase().includes(lower);
+          return { ...n, className: isMatch ? '' : 'opacity-25' };
+        }),
+      );
+
+      if (found.length > 0) {
+        const target = found[0];
+        const zoom = Math.max(getZoom(), 0.5);
+        setCenter(
+          target.position.x + 110,
+          target.position.y + 35,
+          { zoom, duration: 400 },
+        );
+      }
+    },
+    [nodes, setNodes, setCenter, getZoom],
+  );
+
+  const handleNextMatch = useCallback(() => {
+    if (matches.length === 0) return;
+    const next = (matchIndex + 1) % matches.length;
+    setMatchIndex(next);
+    const target = matches[next];
+    const zoom = Math.max(getZoom(), 0.5);
+    setCenter(
+      target.position.x + 110,
+      target.position.y + 35,
+      { zoom, duration: 400 },
+    );
+  }, [matches, matchIndex, setCenter, getZoom]);
+
+  const handleClearSearch = useCallback(() => {
+    setSearchTerm('');
+    setMatches([]);
+    setMatchIndex(0);
+    setNodes((prev) =>
+      prev.map((n) => ({ ...n, className: '' })),
+    );
+    fitView({ padding: 0.15, duration: 300 });
+  }, [setNodes, fitView]);
 
   const onNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
@@ -123,6 +193,43 @@ function GraphCanvasInner({ graph, onSelect }: GraphCanvasInnerProps) {
 
   return (
     <div className="relative w-full h-full">
+      {nodeCount > 0 && (
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+          <div className="flex items-center bg-white rounded-lg shadow-md border border-gray-200">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder={en.graph.searchPlaceholder}
+              className="px-3 py-1.5 text-sm rounded-l-lg border-none focus:outline-none focus:ring-0 w-64"
+            />
+            {searchTerm && (
+              <>
+                <span className="text-xs text-gray-400 px-2 whitespace-nowrap">
+                  {matches.length > 0
+                    ? `${matchIndex + 1}/${matches.length}`
+                    : en.graph.noMatches}
+                </span>
+                {matches.length > 1 && (
+                  <button
+                    onClick={handleNextMatch}
+                    className="px-2 py-1.5 text-gray-500 hover:text-gray-700 text-sm border-l border-gray-200"
+                  >
+                    {en.graph.next}
+                  </button>
+                )}
+                <button
+                  onClick={handleClearSearch}
+                  className="px-2 py-1.5 text-gray-400 hover:text-gray-600 text-sm border-l border-gray-200 rounded-r-lg"
+                >
+                  &times;
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       <ReactFlow
         nodes={nodes}
         edges={edges}

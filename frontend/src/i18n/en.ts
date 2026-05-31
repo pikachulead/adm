@@ -26,6 +26,9 @@ export const en = {
     fitView: 'Fit View',
     nodes: 'nodes',
     edges: 'edges',
+    searchPlaceholder: 'Search graph...',
+    noMatches: 'No matches',
+    next: 'Next',
   },
   entityTypes: {
     domain: 'Domain',

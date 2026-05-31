@@ -4,17 +4,17 @@ import { NODE_CONFIG } from '@/constants/node-config.js';
 import type { EntityType } from '@/types/index.js';
 
 const NODE_WIDTH = 220;
-const NODE_HEIGHT = 70;
+const NODE_HEIGHT = 100;
 
 export function applyDagreLayout(nodes: Node[], edges: Edge[]): Node[] {
   const g = new Dagre.graphlib.Graph();
   g.setDefaultEdgeLabel(() => ({}));
   g.setGraph({
     rankdir: 'LR',
-    nodesep: 50,
-    ranksep: 120,
-    marginx: 20,
-    marginy: 20,
+    nodesep: 240,
+    ranksep: 900,
+    marginx: 40,
+    marginy: 40,
   });
 
   for (const node of nodes) {

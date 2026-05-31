@@ -23,12 +23,12 @@ export function AdmNode({ data, selected }: NodeProps<AdmNodeType>) {
         ${config.border}
       `}
     >
-      <div className={`px-3 py-1.5 flex items-center gap-1.5 ${config.bg} ${config.text}`}>
-        <span className="text-xs">{config.icon}</span>
+      <div className={`px-3 py-2.5 flex items-center gap-1.5 ${config.bg} ${config.text}`}>
+        <span className="text-sm">{config.icon}</span>
         <span className="text-xs font-semibold uppercase tracking-wide">{config.label}</span>
       </div>
-      <div className="px-3 py-2 bg-white">
-        <span className="text-sm font-medium text-gray-800 leading-tight block">
+      <div className="px-3 py-4 bg-white">
+        <span className="text-sm font-medium text-gray-800 leading-snug block">
           {data.label}
         </span>
       </div>
