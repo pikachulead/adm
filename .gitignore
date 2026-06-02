@@ -10,3 +10,4 @@ cdk.out/
 
 *.log
 .logs/
+adm_metadata_embeddings.csv
